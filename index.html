@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test CloudFlare</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer></script>
+
+    <style>
+        html, body {
+            padding: 10px;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+
+    <script>
+        window.onloadTurnstileCallback = function () {
+            turnstile.render('#turnstile-container', {
+                'sitekey': '3x00000000000000000000FF',
+                'callback': function(token) {
+                    console.log(`callback(): Challenge Success token = ${token}`);
+                    if (typeof Android !== 'undefined' && Android !== null) {
+                        Android.onReceivedToken(token);
+                    }
+                },
+                'error-callback' : function(e) { // e is Int (ex: 600010)
+                    console.log(`error-callback(): Challenge Failed e = ${e}`);
+                    if (typeof Android !== 'undefined' && Android !== null) {
+                        Android.onReceivedError();
+                    }
+                },
+                'timeout-callback' : function() { // after ~2m
+                    console.log(`timeout-callback()`);
+                    turnstile.reset('#turnstile-container');
+                },
+                language: 'en',
+            });
+        };
+    </script>
+</head>
+<body>
+    <div id="turnstile-container"></div>
+</body>
+</html>
